@@ -15,18 +15,21 @@ public class CompteMetierImpl implements CompteMetier {
 
     @Autowired
     CompteRepository compteRepository;
+
+
+    //TODO: The update function in controller will declare the saveCompte() also
     @Override
-    public Compte addCompte(Compte c) {
+    public Compte saveCompte(Compte c) {
         return compteRepository.save(c);
     }
 
-    @Override
-    public Compte updateCompte(String code_cmpt, Compte c) {
-        Compte compte = compteRepository.findByCodeCompte(code_cmpt);
-        //TODO: Updating the fields of compte
-//        return compteRepository.save();
-        return null;
-    }
+//    @Override
+//    public Compte updateCompte(String code_cmpt, Compte c) {
+//        Compte compte = compteRepository.findByCodeCompte(code_cmpt);
+//        //TODO: Updating the fields of compte
+////        return compteRepository.save();
+//        return null;
+//    }
 
     @Override
     public void deleteCompte(String code_cmpt) {

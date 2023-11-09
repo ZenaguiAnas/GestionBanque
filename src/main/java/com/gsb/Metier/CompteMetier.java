@@ -6,10 +6,10 @@ import java.util.List;
 
 public interface CompteMetier {
 
-    public Compte addCompte(Compte c);
+    public Compte saveCompte(Compte c);
 //    public Compte updateCompte(String code_cmpt);
 
-    Compte updateCompte(String code_cmpt, Compte c);
+//    Compte updateCompte(String code_cmpt, Compte c);
 
     public void deleteCompte(String code_cmpt);
     public Compte getCompte(String code_cmpt);
