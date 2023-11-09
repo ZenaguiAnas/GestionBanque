@@ -32,4 +32,9 @@ public class ClientRestService {
     public void deleteClient(@PathVariable Long codeClient) {
         clientMetier.deleteClient(codeClient);
     }
+
+    @RequestMapping(value="/authentifierClient",method=RequestMethod.POST)
+    public Client authentifierClient( @RequestBody Client client) {
+        return clientMetier.authentifierClient( client);
+    }
 }

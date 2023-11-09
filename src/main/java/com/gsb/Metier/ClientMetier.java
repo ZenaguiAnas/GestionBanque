@@ -10,5 +10,6 @@ public interface ClientMetier {
     public Client consulterClient(Long code_client);
     public Client updateClient(Long code_client);
     public void deleteClient(Long code_client);
+    public Client authentifierClient( Client client);
 
 }
