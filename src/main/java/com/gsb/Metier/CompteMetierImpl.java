@@ -1,5 +1,6 @@
 package com.gsb.Metier;
 
+import com.gsb.dao.entities.Client;
 import com.gsb.dao.entities.Compte;
 import com.gsb.dao.repository.CompteRepository;
 import jakarta.transaction.Transactional;
@@ -44,8 +45,8 @@ public class CompteMetierImpl implements CompteMetier {
     }
 
     @Override
-    public List<Compte> comptesClient(Long code_cli) {
-        return compteRepository.findByCodeCli(code_cli);
+    public List<Compte> comptesClient(Client client) {
+        return compteRepository.findByClient(client);
     }
 
     @Override
@@ -64,7 +65,7 @@ public class CompteMetierImpl implements CompteMetier {
         Compte compte = compteRepository.findByCodeCompte(code_cmpt);
 
         double currentSolde = compte.getSolde();
-        if (currentSolde > 0) compte.setSolde(compte.getSolde() - montant);
+        if ((currentSolde - montant) > 0) compte.setSolde(currentSolde - montant);
 
         System.out.println("Votre solde est insufisante!");
     }

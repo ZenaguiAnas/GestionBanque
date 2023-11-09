@@ -2,8 +2,8 @@ package com.gsb.Metier;
 
 import com.gsb.dao.entities.Employe;
 import com.gsb.dao.entities.Groupe;
+import com.gsb.dao.entities.Operation;
 
-import java.util.Collection;
 import java.util.List;
 public interface EmployeMetier {
     public Employe saveEmploye(Employe e);
@@ -11,5 +11,10 @@ public interface EmployeMetier {
 
     public void deleteEmployee(Long codeEmploye);
 
-    public Groupe groupOfEmp(Long codeGroupe, Collection<Employe> employes);
+    public Groupe groupOfEmp(Long codeGroupe, Long codeEmploye);
+
+    // Operations
+    public Operation addOperation(Operation operation, String codeCompte, Long codeEmploye);
+    public List<Operation> listOperations(String codeCompte);
+
 }
