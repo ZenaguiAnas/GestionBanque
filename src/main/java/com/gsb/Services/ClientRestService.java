@@ -2,6 +2,7 @@ package com.gsb.Services;
 
 import com.gsb.Metier.ClientMetier;
 import com.gsb.dao.entities.Client;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ public class ClientRestService {
     @RequestMapping(value="/clients",method=RequestMethod.GET)
     public List<Client> listClient() {
         return clientMetier.listClient();
+
     }
 
 
@@ -34,7 +36,10 @@ public class ClientRestService {
     }
 
     @RequestMapping(value="/authentifierClient",method=RequestMethod.POST)
-    public Client authentifierClient( @RequestBody Client client) {
+    public Client authentifierClient(@RequestBody Client client, HttpSession httpSession) {
+        httpSession.setAttribute("Client",client);
+        Client client2= (Client) httpSession.getAttribute("Client");
+        System.out.println(client2.getNomClient());
         return clientMetier.authentifierClient( client);
     }
 }

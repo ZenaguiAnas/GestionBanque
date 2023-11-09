@@ -44,6 +44,7 @@ public class ClientMetierImpl implements ClientMetier {
         Client client = clientRepository.findByCodeClientAndNomClient(client1.getCodeClient(),client1.getNomClient());
         System.out.println("client trouvee"+client);
         if (client != null) {
+
             // Le client a été authentifié avec succès
             return client;
         } else {
