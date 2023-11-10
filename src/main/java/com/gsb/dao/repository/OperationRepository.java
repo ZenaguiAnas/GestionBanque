@@ -1,4 +1,11 @@
 package com.gsb.dao.repository;
+import com.gsb.dao.entities.Compte;
 import com.gsb.dao.entities.Operation;
 import org.springframework.data.jpa.repository.JpaRepository;
-public interface OperationRepository extends JpaRepository<Operation, Long> {}
+
+import java.util.List;
+
+public interface OperationRepository extends JpaRepository<Operation, Long> {
+    List<Operation> findByCompte(Compte compte);
+
+}

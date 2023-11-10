@@ -1,10 +1,12 @@
 package com.gsb.Metier;
 
+import com.gsb.dao.entities.Compte;
 import com.gsb.dao.entities.Employe;
 import com.gsb.dao.entities.Groupe;
 import com.gsb.dao.entities.Operation;
 import com.gsb.dao.repository.EmployeRepository;
 import com.gsb.dao.repository.GroupeRepository;
+import com.gsb.dao.repository.OperationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +21,23 @@ public class EmployeMetierImpl implements EmployeMetier {
     @Autowired
     private GroupeRepository groupeRepository;
 
+    @Autowired
+    private OperationRepository operationRepository;
+
+    CompteMetierImpl compteMetier;
+
     @Override
     public Employe saveEmploye(Employe e) {
-        return employeRepository.save(e);
+    // TODO Auto-generated method stub
+
+        Long supervisorId = e.getEmployeSup().getCodeEmploye();
+        Employe supervisor = employeRepository.findById(supervisorId).orElse(null);
+
+        if (supervisor != null) {
+            return employeRepository.save(e);
+        }
+
+        return null;
     }
 
     @Override
@@ -34,23 +50,48 @@ public class EmployeMetierImpl implements EmployeMetier {
         employeRepository.deleteById(codeEmploye);
     }
 
-    @Override
-    public Groupe groupOfEmp(Long codeGroupe, Long codeEmploye) {
-        Groupe groupe = groupeRepository.findByCodeGroupe(codeGroupe);
-//        Employe employe = employeRepository.findById(codeEmploye);
-//        groupe.setEmploye(employe);
 
-        return groupeRepository.save(groupe);
+    @Override
+    public void addEmployeToGroupe(Long codeGroupe, Long codeEmploye) {
+        Employe employe = employeRepository.findByCodeEmploye(codeEmploye);
+
+        Groupe groupe = groupeRepository.findByCodeGroupe(codeGroupe);
+        System.out.println("GroupeId, " + groupe.getCodeGroupe());
+
+
+        employe.getGroupes().add(groupe);
+        groupe.getEmploye().add(employe);
+        employeRepository.save(employe);
+        groupeRepository.save(groupe);
+    }
+
+
+//    @Override
+//    public Groupe groupOfEmp(Long codeGroupe, Long codeEmploye) {
+//        Groupe groupe = groupeRepository.findByCodeGroupe(codeGroupe);
+//
+//        return groupeRepository.save(groupe);
+//    }
+
+    @Override
+    public List<Employe> getEmployeesByGroup(Long codeGroupe) {
+        Groupe groupe = groupeRepository.findByCodeGroupe(codeGroupe);
+
+        return (List<Employe>) groupe.getEmploye();
     }
 
     @Override
     public Operation addOperation(Operation operation, String codeCompte, Long codeEmploye) {
-        return null;
+        Compte compte = compteMetier.getCompte(codeCompte);
+        Employe employe = employeRepository.findByCodeEmploye(codeEmploye);
+        operation.setCompte(compte);
+        operation.setEmploye(employe);
+        return operationRepository.save(operation);
     }
 
     @Override
-    public List<Operation> listOperations(String codeCompte) {
-        return null;
+    public List<Operation> listOperations(Compte compte) {
+        return operationRepository.findByCompte(compte);
     }
 
     @Override

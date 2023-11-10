@@ -2,7 +2,10 @@ package com.gsb.Metier;
 
 import com.gsb.dao.entities.Client;
 import com.gsb.dao.entities.Compte;
+import com.gsb.dao.entities.Employe;
+import com.gsb.dao.repository.ClientRepository;
 import com.gsb.dao.repository.CompteRepository;
+import com.gsb.dao.repository.EmployeRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,10 +20,21 @@ public class CompteMetierImpl implements CompteMetier {
     @Autowired
     CompteRepository compteRepository;
 
+    @Autowired
+    ClientRepository clientRepository;
+
+    @Autowired
+    EmployeRepository employeRepository;
+
 
     //TODO: The update function in controller will declare the saveCompte() also
     @Override
-    public Compte saveCompte(Compte c) {
+    public Compte addCompte(Compte c, Long codeClient, Long codeEmploye) {
+        Client client = clientRepository.findByCodeClient(codeClient);
+        Employe employe = employeRepository.findByCodeEmploye(codeEmploye);
+        c.setCodeCompte("CA12");
+        c.setClient(client);
+        c.setEmploye(employe);
         return compteRepository.save(c);
     }
 
@@ -40,14 +54,22 @@ public class CompteMetierImpl implements CompteMetier {
     @Override
     public Compte getCompte(String code_cmpt) {
         Compte compte = compteRepository.findByCodeCompte(code_cmpt);
-        if (compte == null) throw new RuntimeException("Compte introuvable");
+        if (compte == null) return null;
         return compte;
     }
 
     @Override
-    public List<Compte> comptesClient(Client client) {
+    public List<Compte> comptesClient(Long code_client) {
+        Client client = clientRepository.findByCodeClient(code_client);
         return compteRepository.findByClient(client);
     }
+
+    @Override
+    public List<Employe> comptesEmployees(Long code_emp) {
+        Employe employe = employeRepository.findByCodeEmploye(code_emp);
+        return compteRepository.findByEmploye(employe);
+    }
+
 
     @Override
     public List<Compte> allComptes() {

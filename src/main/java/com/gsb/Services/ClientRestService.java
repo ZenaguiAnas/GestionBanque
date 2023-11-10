@@ -12,14 +12,14 @@ public class ClientRestService {
     @Autowired
     private ClientMetier clientMetier;
 
-    @GetMapping("/consulterClient/{codeClient}")
-    public Client getClient(@PathVariable Long codeClient) {
-        return clientMetier.consulterClient(codeClient);
-    }
-
     @RequestMapping(value="/create-client",method=RequestMethod.POST)
     public Client saveClient(@RequestBody Client c) {
         return clientMetier.saveClient(c);
+    }
+
+    @GetMapping("/consulterClient/{codeClient}")
+    public Client getClient(@PathVariable Long codeClient) {
+        return clientMetier.consulterClient(codeClient);
     }
 
     @RequestMapping(value="/clients",method=RequestMethod.GET)
@@ -27,8 +27,6 @@ public class ClientRestService {
         return clientMetier.listClient();
 
     }
-
-
 
     @RequestMapping(value="/delete-client/{codeClient}",method=RequestMethod.DELETE)
     public void deleteClient(@PathVariable Long codeClient) {
@@ -42,4 +40,5 @@ public class ClientRestService {
         System.out.println(client2.getNomClient());
         return clientMetier.authentifierClient( client);
     }
+
 }
