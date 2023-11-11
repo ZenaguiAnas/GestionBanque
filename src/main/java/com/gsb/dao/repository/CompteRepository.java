@@ -11,5 +11,5 @@ public interface CompteRepository extends JpaRepository<Compte, String> {
 
     List<Compte> findByClient(Client client);
 
-    List<Employe> findByEmploye(Employe employe);
+    List<Compte> findByEmploye(Employe employe);
 }

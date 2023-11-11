@@ -2,10 +2,8 @@ package com.gsb.Services;
 
 import com.gsb.Metier.CompteMetier;
 import com.gsb.Metier.EmployeMetier;
-import com.gsb.dao.entities.Client;
-import com.gsb.dao.entities.Employe;
-import com.gsb.dao.entities.Retrait;
-import com.gsb.dao.entities.Versment;
+import com.gsb.dao.entities.*;
+import com.gsb.dao.repository.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +14,12 @@ import java.util.Map;
 public class EmployeRestService {
     @Autowired
     private EmployeMetier employeMetier;
+
+    @Autowired
     private CompteMetier compteMetier;
+
+    @Autowired
+    private ClientRepository clientRepository;
 
     @RequestMapping(value="/add-employe",method=RequestMethod.POST)
     public Employe saveEmploye(@RequestBody Employe e) {
@@ -25,8 +28,10 @@ public class EmployeRestService {
 
     @RequestMapping(value="/employes",method=RequestMethod.GET)
     public List<Employe> listEmployes() {
+        System.out.println(clientRepository.findById(1L).orElse(null).getNomClient());
         return employeMetier.listEmployes();
     }
+
     @RequestMapping(value="/authentifierEmploye",method=RequestMethod.POST)
     public Employe authentifierEmploye( @RequestBody Employe employe) {
         return employeMetier.authentifierEmploye( employe);
@@ -53,21 +58,30 @@ public class EmployeRestService {
     }
 
     @RequestMapping(value="/versement",method=RequestMethod.PUT)
-    public void verser(@RequestBody String code_cmpt, @RequestBody Long codeEmploye, @RequestBody double montant) {
+    public void verser(@RequestBody Map<String, Object> request) {
+        String code_cmpt = (String) request.get("codeCompte");
+        Integer codeEmploye = (Integer) request.get("codeEmploye");
+        Integer montant = (Integer) request.get("montant");
+
         compteMetier.verser(code_cmpt, montant);
-        employeMetier.addOperation(new Versment(), code_cmpt, codeEmploye);
+        employeMetier.addOperation(new Versment(), code_cmpt, codeEmploye.longValue(), montant.doubleValue());
     }
 
     @RequestMapping(value="/retrait",method=RequestMethod.PUT)
-    public void retirer(@RequestBody String code_cmpt, @RequestBody Long codeEmploye, @RequestBody double montant) {
+    public void retirer(@RequestBody Map<String, Object> request) {
+        String code_cmpt = (String) request.get("codeCompte");
+        Integer codeEmploye = (Integer) request.get("codeEmploye");
+        Integer montant = (Integer) request.get("montant");
+
         compteMetier.retrait(code_cmpt, montant);
-        employeMetier.addOperation(new Retrait(), code_cmpt, codeEmploye);
+        employeMetier.addOperation(new Retrait(), code_cmpt, codeEmploye.longValue(), montant.doubleValue());
     }
 
-//    @RequestMapping(value="/compte-operations",method=RequestMethod.GET)
-//    public List<Operation> listOperationsOfCompte(@PathVariable String codeCompte){
-//        return employeMetier.listOperations(codeCompte);
-//    }
+    @RequestMapping(value="/compte-operations/{codeCompte}",method=RequestMethod.GET)
+    public List<Operation> listOperationsOfCompte(@PathVariable String codeCompte){
+        Compte compte = compteMetier.getCompte(codeCompte);
+        return employeMetier.listOperations(compte);
+    }
 
 
 

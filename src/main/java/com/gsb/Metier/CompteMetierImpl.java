@@ -6,7 +6,6 @@ import com.gsb.dao.entities.Employe;
 import com.gsb.dao.repository.ClientRepository;
 import com.gsb.dao.repository.CompteRepository;
 import com.gsb.dao.repository.EmployeRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,25 +13,24 @@ import java.util.List;
 
 
 @Service
-@Transactional
 public class CompteMetierImpl implements CompteMetier {
 
     @Autowired
-    CompteRepository compteRepository;
+    private CompteRepository compteRepository;
 
     @Autowired
-    ClientRepository clientRepository;
+    private ClientRepository clientRepository;
 
     @Autowired
-    EmployeRepository employeRepository;
+    private EmployeRepository employeRepository;
 
 
     //TODO: The update function in controller will declare the saveCompte() also
     @Override
-    public Compte addCompte(Compte c, Long codeClient, Long codeEmploye) {
+    public Compte addCompte(Compte c, Long codeClient, Long codeEmploye, String codeCompte) {
         Client client = clientRepository.findByCodeClient(codeClient);
         Employe employe = employeRepository.findByCodeEmploye(codeEmploye);
-        c.setCodeCompte("CA12");
+        c.setCodeCompte(codeCompte);
         c.setClient(client);
         c.setEmploye(employe);
         return compteRepository.save(c);
@@ -54,6 +52,7 @@ public class CompteMetierImpl implements CompteMetier {
     @Override
     public Compte getCompte(String code_cmpt) {
         Compte compte = compteRepository.findByCodeCompte(code_cmpt);
+        System.out.println("Code Compte, " + compte.getCodeCompte());
         if (compte == null) return null;
         return compte;
     }
@@ -65,7 +64,7 @@ public class CompteMetierImpl implements CompteMetier {
     }
 
     @Override
-    public List<Employe> comptesEmployees(Long code_emp) {
+    public List<Compte> comptesEmployees(Long code_emp) {
         Employe employe = employeRepository.findByCodeEmploye(code_emp);
         return compteRepository.findByEmploye(employe);
     }

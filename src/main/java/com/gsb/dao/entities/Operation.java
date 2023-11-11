@@ -1,11 +1,14 @@
 package com.gsb.dao.entities;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 
 //import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "numeroOperation")
 @Inheritance(strategy=InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(length=1)
 public class Operation implements Serializable {

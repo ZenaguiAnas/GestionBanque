@@ -10,7 +10,6 @@ import com.gsb.dao.repository.OperationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -24,7 +23,8 @@ public class EmployeMetierImpl implements EmployeMetier {
     @Autowired
     private OperationRepository operationRepository;
 
-    CompteMetierImpl compteMetier;
+    @Autowired
+    private CompteMetier compteMetier;
 
     @Override
     public Employe saveEmploye(Employe e) {
@@ -81,11 +81,13 @@ public class EmployeMetierImpl implements EmployeMetier {
     }
 
     @Override
-    public Operation addOperation(Operation operation, String codeCompte, Long codeEmploye) {
+    public Operation addOperation(Operation operation, String codeCompte, Long codeEmploye, double montant) {
         Compte compte = compteMetier.getCompte(codeCompte);
         Employe employe = employeRepository.findByCodeEmploye(codeEmploye);
         operation.setCompte(compte);
         operation.setEmploye(employe);
+        operation.setMontant(montant);
+
         return operationRepository.save(operation);
     }
 
