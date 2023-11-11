@@ -4,6 +4,7 @@ import com.gsb.Metier.CompteMetier;
 import com.gsb.Metier.EmployeMetier;
 import com.gsb.dao.entities.*;
 import com.gsb.dao.repository.ClientRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,9 +33,17 @@ public class EmployeRestService {
         return employeMetier.listEmployes();
     }
 
-    @RequestMapping(value="/authentifierEmploye",method=RequestMethod.POST)
-    public Employe authentifierEmploye( @RequestBody Employe employe) {
-        return employeMetier.authentifierEmploye( employe);
+    @RequestMapping(value="/authentifierEmploye", method=RequestMethod.POST)
+    public Employe authentifierClient(@RequestParam("codeEmploye") Long codeEmploye, @RequestParam("nomEmploye") String nomEmploye, HttpSession httpSession) {
+        Employe employe = new Employe();
+        employe.setCodeEmploye(codeEmploye);
+        employe.setNomEmploye(nomEmploye);
+
+        httpSession.setAttribute("Employe", employe);
+        Employe employe2 = (Employe) httpSession.getAttribute("Employe");
+        System.out.println(employe2.getNomEmploye());
+
+        return employeMetier.authentifierEmploye(employe);
     }
 
     @RequestMapping(value="/delete-employe/{codeEmploye}",method=RequestMethod.DELETE)

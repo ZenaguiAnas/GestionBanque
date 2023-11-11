@@ -4,9 +4,12 @@ import com.gsb.Metier.ClientMetier;
 import com.gsb.dao.entities.Client;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ClientRestService {
@@ -33,18 +36,27 @@ public class ClientRestService {
         clientMetier.deleteClient(codeClient);
     }
 
-    @RequestMapping(value="/authentifierClient", method=RequestMethod.POST)
-    public Client authentifierClient(@RequestParam("codeClient") Long codeClient, @RequestParam("nomClient") String nomClient, HttpSession httpSession) {
-        Client client = new Client();
-        client.setCodeClient(codeClient);
-        client.setNomClient(nomClient);
+    @PostMapping("/authentifierClient")
+    public String authentifierClient(@ModelAttribute("client") Client client,Model model  , HttpSession httpSession) {
 
-        httpSession.setAttribute("Client", client);
+        Client clientX = new Client();
+        clientX.setCodeClient((Long) client.getCodeClient());
+        clientX.setNomClient((String) client.getNomClient());
+        model.addAttribute("Client",clientX);
+
+        httpSession.setAttribute("Client", clientX);
         Client client2 = (Client) httpSession.getAttribute("Client");
         System.out.println(client2.getNomClient());
-
-        return clientMetier.authentifierClient(client);
+        clientMetier.authentifierClient(clientX);
+        return "redirect:/authentifierClient";
     }
+    @GetMapping("/auth")
+    public ModelAndView authentifierClient() {
+        ModelAndView modelAndView= new ModelAndView("authentifierClient");
+
+    return modelAndView;
+    }
+
 
 
 }
