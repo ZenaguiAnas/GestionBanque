@@ -33,12 +33,18 @@ public class ClientRestService {
         clientMetier.deleteClient(codeClient);
     }
 
-    @RequestMapping(value="/authentifierClient",method=RequestMethod.POST)
-    public Client authentifierClient(@RequestBody Client client, HttpSession httpSession) {
-        httpSession.setAttribute("Client",client);
-        Client client2= (Client) httpSession.getAttribute("Client");
+    @RequestMapping(value="/authentifierClient", method=RequestMethod.POST)
+    public Client authentifierClient(@RequestParam("codeClient") Long codeClient, @RequestParam("nomClient") String nomClient, HttpSession httpSession) {
+        Client client = new Client();
+        client.setCodeClient(codeClient);
+        client.setNomClient(nomClient);
+
+        httpSession.setAttribute("Client", client);
+        Client client2 = (Client) httpSession.getAttribute("Client");
         System.out.println(client2.getNomClient());
-        return clientMetier.authentifierClient( client);
+
+        return clientMetier.authentifierClient(client);
     }
+
 
 }
