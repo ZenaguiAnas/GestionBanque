@@ -1,6 +1,5 @@
 package com.gsb;
 
-import jakarta.servlet.http.HttpSession;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +15,7 @@ public class GsBancaireApplication {
     }
 
 
-    @GetMapping("/")
+    @GetMapping
     public String hello(){
         return "Hello World";
     }

@@ -4,7 +4,6 @@ import com.gsb.dao.entities.Compte;
 import com.gsb.dao.entities.Employe;
 import com.gsb.dao.entities.Operation;
 
-import java.util.Collection;
 import java.util.List;
 public interface EmployeMetier {
     public Employe saveEmploye(Employe e);
@@ -19,7 +18,7 @@ public interface EmployeMetier {
 //    public Groupe groupOfEmp(Long codeGroupe, Long codeEmploye);
     public List<Employe> getEmployeesByGroup(Long codeGroupe);
     // Operations
-    public Operation addOperation(Operation operation, String codeCompte, Long codeEmploye);
+    public Operation addOperation(Operation operation, String codeCompte, Long codeEmploye, double montant);
     public List<Operation> listOperations(Compte compte);
 
     Employe authentifierEmploye(Employe employe);
