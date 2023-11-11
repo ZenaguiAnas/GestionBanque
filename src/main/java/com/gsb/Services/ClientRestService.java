@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 public class ClientRestService {
@@ -23,6 +22,7 @@ public class ClientRestService {
 
     @GetMapping("/client/{codeClient}")
     public Client getClient(@PathVariable Long codeClient) {
+
         return clientMetier.consulterClient(codeClient);
     }
 
@@ -37,7 +37,7 @@ public class ClientRestService {
     }
 
     @PostMapping("/authentifierClient")
-    public String authentifierClient(@ModelAttribute("client") Client client,Model model  , HttpSession httpSession) {
+    public String authentifierClient(@ModelAttribute("client") Client client, Model model  , HttpSession httpSession) {
 
         Client clientX = new Client();
         clientX.setCodeClient((Long) client.getCodeClient());
@@ -51,8 +51,10 @@ public class ClientRestService {
         return "redirect:/authentifierClient";
     }
     @GetMapping("/auth")
-    public ModelAndView authentifierClient() {
+    public ModelAndView authentifierClient(Model model) {
         ModelAndView modelAndView= new ModelAndView("authentifierClient");
+        Client client = new Client();
+        model.addAttribute("client", client);
 
     return modelAndView;
     }
