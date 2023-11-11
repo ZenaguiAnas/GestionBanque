@@ -2,6 +2,7 @@ package com.gsb.Metier;
 
 import com.gsb.dao.entities.Client;
 import com.gsb.dao.repository.ClientRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,8 @@ import java.util.List;
 @Transactional
 public class ClientMetierImpl implements ClientMetier {
     @Autowired
-    private ClientRepository clientRepository;
+    ClientRepository clientRepository;
+
     @Override
     public Client saveClient(Client c) {
 // TODO Auto-generated method stub
@@ -25,8 +27,14 @@ public class ClientMetierImpl implements ClientMetier {
     }
 
     @Override
-    public Client consulterClient(Long code_client) {
-        return clientRepository.findByCodeClient(code_client);
+    public Client consulterClient(Long codeClient) {
+        Client client = clientRepository.findByCodeClient(codeClient);
+        if (client != null) {
+            return client;
+        } else {
+            // You can throw an exception or handle null cases based on your application's requirements.
+            throw new EntityNotFoundException("Client not found for code: " + codeClient);
+        }
     }
 
     @Override

@@ -1,13 +1,12 @@
 package com.gsb.Metier;
 
 import com.gsb.dao.entities.Compte;
-import com.gsb.dao.entities.Employe;
 
 import java.util.List;
 
 public interface CompteMetier {
 
-    public Compte addCompte(Compte c, Long codeClient, Long codeEmploye);
+    public Compte addCompte(Compte c, Long codeClient, Long codeEmploye, String codeCompte);
 //    public Compte updateCompte(String code_cmpt);
 
 //    Compte updateCompte(String code_cmpt, Compte c);
@@ -15,7 +14,7 @@ public interface CompteMetier {
     public void deleteCompte(String code_cmpt);
     public Compte getCompte(String code_cmpt);
     public List<Compte> comptesClient(Long code_client);
-    public List<Employe> comptesEmployees(Long code_emp);
+    public List<Compte> comptesEmployees(Long code_emp);
     public List<Compte> allComptes();
 
     // The operations on the account

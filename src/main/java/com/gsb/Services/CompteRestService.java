@@ -7,6 +7,7 @@ import com.gsb.dao.entities.CompteEpargne;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -21,18 +22,42 @@ public class CompteRestService {
         String typeOfCompte = (String) requestData.get("typeOfCompte");
         Integer codeClient = (Integer) requestData.get("codeClient");
         Integer codeEmploye = (Integer) requestData.get("codeEmploye");
+        String codeCompte = (String) requestData.get("codeCompte");
 
         if (typeOfCompte.equals("E")) {
-            return compteMetier.addCompte(new CompteEpargne(), codeClient.longValue(), codeEmploye.longValue());
+            return compteMetier.addCompte(new CompteEpargne(), codeClient.longValue(), codeEmploye.longValue(), codeCompte);
         }
-        return compteMetier.addCompte(new CompteCourant(), codeClient.longValue(), codeEmploye.longValue());
+        return compteMetier.addCompte(new CompteCourant(), codeClient.longValue(), codeEmploye.longValue(), codeCompte);
     }
 
-//    @RequestMapping(value="/get-compte",method= RequestMethod.GET)
-//    public Compte getCompte(@RequestBody Map<String, Object> requestData) {
+    @RequestMapping(value="/get-compte/{codeCompte}",method= RequestMethod.GET)
+    public Compte getCompte(@PathVariable String codeCompte) {
 //        String codeCompte = (String) requestData.get("codeCompte");
-//
-//        System.out.println("codeCompte, " + codeCompte );
-//        return compteMetier.getCompte(codeCompte);
-//    }
+
+        System.out.println("codeCompte, " + codeCompte );
+        return compteMetier.getCompte(codeCompte);
+    }
+
+    @RequestMapping(value="/delete-compte/{codeCompte}",method=RequestMethod.DELETE)
+    public void deleteCompte(@PathVariable String codeCompte) {
+        compteMetier.deleteCompte(codeCompte);
+    }
+
+    @RequestMapping(value="/comptes",method=RequestMethod.GET)
+    public List<Compte> listCompte() {
+        return compteMetier.allComptes();
+    }
+
+    @RequestMapping(value="/comptes-client/{codeClient}",method=RequestMethod.GET)
+    public List<Compte> listCompteClient(@PathVariable Long codeClient) {
+        return compteMetier.comptesClient(codeClient);
+    }
+
+    @RequestMapping(value="/comptes-employe/{codeEmploye}",method=RequestMethod.GET)
+    public List<Compte> listCompteEmploye(@PathVariable Long codeEmploye) {
+        return compteMetier.comptesEmployees(codeEmploye);
+    }
+
+
+
 }
