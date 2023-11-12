@@ -85,10 +85,10 @@ public class CompteMetierImpl implements CompteMetier {
     public void retrait(String code_cmpt, double montant) {
         Compte compte = compteRepository.findByCodeCompte(code_cmpt);
 
-        double currentSolde = compte.getSolde();
-        if ((currentSolde - montant) > 0) compte.setSolde(currentSolde - montant);
+//        double currentSolde = compte.getSolde();
+        compte.setSolde(compte.getSolde() - montant);
 
-        System.out.println("Votre solde est insufisante!");
+//        System.out.println("Votre solde est insufisante!");
     }
 
     @Override

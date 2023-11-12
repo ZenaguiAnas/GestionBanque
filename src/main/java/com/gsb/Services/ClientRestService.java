@@ -42,6 +42,8 @@ public class ClientRestService {
         clientMetier.deleteClient(codeClient);
     }
 
+
+    // TODO : Templates
     @PostMapping("/authentifierClient")
     public String authentifierClient(@ModelAttribute("client") Client client, Model model  , HttpSession httpSession) {
 

@@ -2,9 +2,63 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Operation Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .operation-box {
+            transition: transform 0.3s ease-in-out;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-gray-100 h-screen flex flex-col items-center">
+
+<form th:action="@{/operations-page}" method="post" class="my-8">
+    <select name="selectedCompte" id="compte" class="border border-gray-300 py-2 px-4 rounded-lg">
+        <option value="">-- Select Account --</option>
+        <th:block th:each="compte : ${comptes}">
+            <option th:value="${compte.codeCompte}" th:text="${compte.codeCompte}"></option>
+        </th:block>
+    </select>
+    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out ml-4">View Operations</button>
+</form>
+
+<section th:if="${selectedCompte}" class="mt-8 flex justify-between w-full">
+    <section class="w-1/2 mt-8 m-5 bg-white rounded-lg p-4">
+        <h2 class="text-xl mb-4">Manage Operations for Compte <span th:text="${selectedCompte.codeCompte}"></span></h2>
+        <form th:action="@{/add-operation}" method="post">
+            <div class="mb-4">
+                <label class="block text-gray-700 text-md font-bold mb-4">Operation Type:</label>
+                <div class="flex items-center space-x-4">
+                    <div>
+                        <input type="radio" id="retrait" name="operationType" value="Retrait" class="form-radio h-5 w-5 text-blue-600">
+                        <label for="retrait" class="text-gray-700 ml-2">Retrait</label>
+                    </div>
+                    <div>
+                        <input type="radio" id="versement" name="operationType" value="Versement" class="form-radio h-5 w-5 text-blue-600">
+                        <label for="versement" class="text-gray-700 ml-2">Versement</label>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="codeCompte" th:value="${selectedCompte.codeCompte}" />
+            <input type="number" name="montant" class="border border-gray-300 py-2 px-4 rounded-lg w-full mt-4" step="0.01" placeholder="Enter Amount">            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4 w-full">Add Operation</button>
+        </form>
+
+
+
+    </section>
+
+
+    <section class="w-1/2 mt-8 m-5 bg-white rounded-lg p-4">
+        <h2 class="text-xl mb-4">Operations for Compte <span th:text="${selectedCompte.codeCompte}"></span></h2>
+        <div th:each="operation : ${selectedCompte.operations}" class="operation-box p-4 border border-white bg-gray-200 rounded-lg transform hover:scale-105 mb-4">
+            <span class="font-semibold block mb-1">Operation Number:</span>
+            <span th:text="${operation.numeroOperation}"></span>
+            <span class="font-semibold block mb-1">Amount:</span>
+            <span th:text="${operation.montant}"></span>
+        </div>
+    </section>
+
+</section>
 
 </body>
 </html>
