@@ -24,6 +24,8 @@ public class Operation implements Serializable {
     @JoinColumn(name = "CODE_EMP")
     private Employe employe;
 
+    transient private String typeOperation;
+
     public Operation(Date dateOperation, double montant) {
         super();
         this.dateOperation = dateOperation;
@@ -64,5 +66,13 @@ public class Operation implements Serializable {
     }
     public void setEmploye(Employe employe) {
         this.employe = employe;
+    }
+
+    public String getTypeOperation() {
+        return typeOperation;
+    }
+
+    public void setTypeOperation(String typeOperation) {
+        this.typeOperation = typeOperation;
     }
 }

@@ -164,12 +164,20 @@ public class CompteRestService {
         Operation operation = new Operation();
 
         comptes.forEach(compte -> {
+            compte.getOperations().forEach(op -> {
+                if (op instanceof Retrait) {
+                    ((Retrait) op).setTypeOperation("Retrait");
+                } else if (op instanceof Versment) {
+                    ((Versment) op).setTypeOperation("Versment");
+                }
+            });
             if (compte instanceof CompteCourant) {
                 ((CompteCourant) compte).setTypeCompte("Compte Courant");
             } else if (compte instanceof CompteEpargne) {
                 ((CompteEpargne) compte).setTypeCompte("Compte Epargne");
             }
         });
+
 
         model.addAttribute("comptes", comptes);
         model.addAttribute("operation", operation);
@@ -181,11 +189,11 @@ public class CompteRestService {
     }
 
     @PostMapping("/add-operation")
-    public void addOperation(@ModelAttribute("operation") Operation operation, @RequestParam("operationType") String operationType, @RequestParam("codeCompte") String codeCompte) {
+    public void addOperation(@ModelAttribute("operation") Operation operation, @RequestParam("operationType") String operationType, @RequestParam("codeCompte") String codeCompte, @RequestParam(value = "selectedOtherCompte", required = false) String selectedOtherCompte) {
 
-        System.out.println("operationType, " + operationType);
-        System.out.println("selectedCompteCode, " + codeCompte);
-        System.out.println("monatnt, " + operation.getMontant());
+//        System.out.println("operationType, " + operationType);
+        System.out.println("selectedCompteCode, " + selectedOtherCompte);
+//        System.out.println("monatnt, " + operation.getMontant());
 
         if (operationType.equals("Retrait")){
             compteMetier.retrait(codeCompte, operation.getMontant());
@@ -193,6 +201,10 @@ public class CompteRestService {
         } else if (operationType.equals("Versement")) {
             compteMetier.verser(codeCompte, operation.getMontant());
             employeMetier.addOperation(new Versment(), codeCompte, 1L, operation.getMontant());
+        }
+        else if (operationType.equals("Virement")) {
+            compteMetier.virement(codeCompte, selectedOtherCompte, operation.getMontant());
+            employeMetier.addOperation(new Virement(), codeCompte, 1L, operation.getMontant());
         }
 
     }
