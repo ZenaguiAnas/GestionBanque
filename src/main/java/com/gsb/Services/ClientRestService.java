@@ -88,24 +88,30 @@ public class ClientRestService {
 
     @PostMapping("/create-client")
     public String createClient(@ModelAttribute("client") Client client, @RequestParam("typeCpte") String typeCpte) {
-
-        System.out.println("typeCpte, " + typeCpte);
-
         Client client1 = clientMetier.saveClient(client);
 
-        int maxClientComptes = compteMetier.comptesClient(client1.getCodeClient()).size();
+        String codeCompte = generateUniqueCodeCompte(typeCpte, client1.getCodeClient());
 
-        String typeOfCompte = typeCpte;
-        Long codeClient = client1.getCodeClient();
-        Long codeEmploye = 1L;
-        String codeCompte = typeOfCompte.split(" ")[1].substring(0, 2) + codeClient.toString() + maxClientComptes;
-
-        if (typeOfCompte.equals("Compte Courant")) {
-            compteMetier.addCompte(new CompteEpargne(), codeClient, codeEmploye, codeCompte);
+        try {
+            saveCompte(typeCpte, client.getCodeClient(), 1L, codeCompte);
+        } catch (Exception e) {
+            throw new RuntimeException("There is an error!");
         }
-        compteMetier.addCompte(new CompteCourant(), codeClient, codeEmploye, codeCompte);
 
         return "redirect:/clients-page";
+    }
+
+    private String generateUniqueCodeCompte(String typeCpte, Long codeClient) {
+        int maxClientComptes = compteMetier.comptesClient(codeClient).size();
+        return typeCpte.split(" ")[1].substring(0, 2).toUpperCase() + codeClient.toString() + maxClientComptes;
+    }
+
+    private void saveCompte(String typeCpte, Long codeClient, Long codeEmploye, String codeCompte) {
+        if (typeCpte.equals("Compte Courant")) {
+            compteMetier.addCompte(new CompteCourant(), codeClient, codeEmploye, codeCompte);
+        } else {
+            compteMetier.addCompte(new CompteEpargne(), codeClient, codeEmploye, codeCompte);
+        }
     }
 
 

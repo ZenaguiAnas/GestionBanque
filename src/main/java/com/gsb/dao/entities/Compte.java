@@ -28,6 +28,9 @@ public abstract class Compte implements Serializable {
         this.dateCreation = dateCreation;
         this.solde = solde;
     }
+
+    transient private String typeCompte;
+
     public Compte() {
         super();
 // TODO Auto-generated constructor stub
@@ -67,5 +70,13 @@ public abstract class Compte implements Serializable {
     }
     public void setOperations(Collection<Operation> operations) {
         this.operations = operations;
+    }
+
+    public String getTypeCompte() {
+        return typeCompte;
+    }
+
+    public void setTypeCompte(String typeCompte) {
+        this.typeCompte = typeCompte;
     }
 }

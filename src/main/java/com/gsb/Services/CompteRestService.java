@@ -5,7 +5,9 @@ import com.gsb.dao.entities.Compte;
 import com.gsb.dao.entities.CompteCourant;
 import com.gsb.dao.entities.CompteEpargne;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +60,27 @@ public class CompteRestService {
     public List<Compte> listCompteEmploye(@PathVariable Long codeEmploye) {
         Map<String, Object> requestData = new HashMap<>();
         return compteMetier.comptesEmployees(codeEmploye);
+    }
+
+
+    //TODO : TEMPLATES
+    @GetMapping("/comptes-page")
+    public ModelAndView getComptesPage(Model model) {
+        ModelAndView modelAndView = new ModelAndView("Views/Comptes");
+
+        List<Compte> comptes = compteMetier.allComptes();
+
+        comptes.forEach(compte -> {
+            if (compte instanceof CompteCourant) {
+                ((CompteCourant) compte).setTypeCompte("Compte Courant");
+            } else if (compte instanceof CompteEpargne) {
+                ((CompteEpargne) compte).setTypeCompte("Compte Epargne");
+            }
+        });
+
+        model.addAttribute("comptes", comptes);
+
+        return modelAndView;
     }
 
 

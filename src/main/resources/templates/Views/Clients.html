@@ -4,9 +4,6 @@
     <meta charset="UTF-8">
     <title>Clients Page</title>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
-    <style>
-        /* You can include additional style overrides here */
-    </style>
 </head>
 <body class="antialiased font-sans bg-gray-200">
 <div th:replace="~{Base/navbar :: content}"></div>
@@ -14,12 +11,14 @@
 <div class="container mx-auto px-4 sm:px-8 py-8">
     <div class="flex justify-between mb-4">
         <div>
-            <input type="text" placeholder="Search..." class="border border-gray-300 py-2 px-4 rounded-lg">
+            <input type="text" placeholder="Search..." id="searchInput" class="border border-gray-300 py-2 px-4 rounded-lg">
         </div>
         <div>
-            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
-                Add Client
-            </button>
+            <form th:action="@{/add-client}" method="get">
+                <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                    Add Client
+                </button>
+            </form>
         </div>
     </div>
     <div class="overflow-x-auto">
@@ -54,11 +53,38 @@
                 </td>
             </tr>
             </tbody>
+            <tfoot>
+            <tr>
+                <td colspan="3" class="px-6 py-4 text-right font-semibold">Total Clients:</td>
+                <td class="px-6 py-4 text-center font-semibold">
+                    <span th:text="${#lists.size(clients)}"></span>
+                </td>
+            </tr>
+            </tfoot>
         </table>
     </div>
 </div>
 
+<script th:inline="javascript">
+    const searchInput = document.getElementById('searchInput');
+    const tableRows = document.querySelectorAll('tr');
 
+    searchInput.addEventListener('input', function () {
+        const searchTerm = searchInput.value.trim().toLowerCase();
+
+        tableRows.forEach(row => {
+            const clientIDColumn = row.cells[0];
+            const clientNameColumn = row.cells[1];
+
+            if (clientIDColumn.innerText.toLowerCase().includes(searchTerm) ||
+                clientNameColumn.innerText.toLowerCase().includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
 
 </body>
 </html>
