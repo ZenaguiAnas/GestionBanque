@@ -1,7 +1,10 @@
 package com.gsb.Services;
 
 import com.gsb.Metier.ClientMetier;
+import com.gsb.Metier.CompteMetier;
 import com.gsb.dao.entities.Client;
+import com.gsb.dao.entities.CompteCourant;
+import com.gsb.dao.entities.CompteEpargne;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -15,10 +18,13 @@ public class ClientRestService {
     @Autowired
     private ClientMetier clientMetier;
 
-    @RequestMapping(value="/create-client",method=RequestMethod.POST)
-    public Client saveClient(@RequestBody Client c) {
-        return clientMetier.saveClient(c);
-    }
+    @Autowired
+    private CompteMetier compteMetier;
+
+//    @RequestMapping(value="/create-client",method=RequestMethod.POST)
+//    public Client saveClient(@RequestBody Client c) {
+//        return clientMetier.saveClient(c);
+//    }
 
     @GetMapping("/client/{codeClient}")
     public Client getClient(@PathVariable Long codeClient) {
@@ -50,14 +56,58 @@ public class ClientRestService {
         clientMetier.authentifierClient(clientX);
         return "redirect:/authentifierClient";
     }
+
     @GetMapping("/auth")
     public ModelAndView authentifierClient(Model model) {
         ModelAndView modelAndView= new ModelAndView("authentifierClient");
         Client client = new Client();
         model.addAttribute("client", client);
 
-    return modelAndView;
+        return modelAndView;
     }
+
+    @GetMapping("/clients-page")
+    public ModelAndView getClientsPage(Model model) {
+        ModelAndView modelAndView= new ModelAndView("Views/Clients");
+        model.addAttribute("clients", clientMetier.listClient());
+
+        return modelAndView;
+    }
+
+    @GetMapping("/add-client")
+    public ModelAndView addClientsPage(Model model) {
+        ModelAndView modelAndView= new ModelAndView("Components/AddClient");
+
+        Client client = new Client();
+        model.addAttribute("client", client);
+        model.addAttribute("typeCpte", "");
+
+
+        return modelAndView;
+    }
+
+    @PostMapping("/create-client")
+    public String createClient(@ModelAttribute("client") Client client, @RequestParam("typeCpte") String typeCpte) {
+
+        System.out.println("typeCpte, " + typeCpte);
+
+        Client client1 = clientMetier.saveClient(client);
+
+        int maxClientComptes = compteMetier.comptesClient(client1.getCodeClient()).size();
+
+        String typeOfCompte = typeCpte;
+        Long codeClient = client1.getCodeClient();
+        Long codeEmploye = 1L;
+        String codeCompte = typeOfCompte.split(" ")[1].substring(0, 2) + codeClient.toString() + maxClientComptes;
+
+        if (typeOfCompte.equals("Compte Courant")) {
+            compteMetier.addCompte(new CompteEpargne(), codeClient, codeEmploye, codeCompte);
+        }
+        compteMetier.addCompte(new CompteCourant(), codeClient, codeEmploye, codeCompte);
+
+        return "redirect:/clients-page";
+    }
+
 
 
 

@@ -7,6 +7,7 @@ import com.gsb.dao.entities.CompteEpargne;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,9 +56,9 @@ public class CompteRestService {
 
     @RequestMapping(value="/comptes-employe/{codeEmploye}",method=RequestMethod.GET)
     public List<Compte> listCompteEmploye(@PathVariable Long codeEmploye) {
+        Map<String, Object> requestData = new HashMap<>();
         return compteMetier.comptesEmployees(codeEmploye);
     }
-
 
 
 }

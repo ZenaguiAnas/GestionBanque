@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Clients Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.15/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* You can include additional style overrides here */
+    </style>
+</head>
+<body class="antialiased font-sans bg-gray-200">
+<div th:replace="~{Base/navbar :: content}"></div>
+
+<div class="container mx-auto px-4 sm:px-8 py-8">
+    <div class="flex justify-between mb-4">
+        <div>
+            <input type="text" placeholder="Search..." class="border border-gray-300 py-2 px-4 rounded-lg">
+        </div>
+        <div>
+            <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                Add Client
+            </button>
+        </div>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
+            <thead>
+            <tr class="bg-gray-50">
+                <th class="px-6 py-3">ID</th>
+                <th class="px-6 py-3">Name</th>
+                <th class="px-6 py-3">Comptes</th>
+                <th class="px-6 py-3">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="client : ${clients}" class="text-gray-700 transition duration-300 ease-in-out hover:bg-gray-100">
+                <td class="px-6 py-4 border text-center">
+                    <span th:text="${client.codeClient}"></span>
+                </td>
+                <td class="px-6 py-4 border text-center">
+                    <span th:text="${client.nomClient}"></span>
+                </td>
+                <td class="px-6 py-4 border text-center">
+                    <ul>
+                        <li th:each="compte : ${client.comptes}" class="py-1">
+                            <span th:text="${compte.codeCompte}"></span>
+                        </li>
+                    </ul>
+                </td>
+                <td class="px-6 py-4 border text-center">
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out">
+                        View
+                    </button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+</body>
+</html>
