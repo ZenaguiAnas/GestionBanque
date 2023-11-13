@@ -189,7 +189,7 @@ public class CompteRestService {
     }
 
     @PostMapping("/add-operation")
-    public void addOperation(@ModelAttribute("operation") Operation operation, @RequestParam("operationType") String operationType, @RequestParam("codeCompte") String codeCompte, @RequestParam(value = "selectedOtherCompte", required = false) String selectedOtherCompte) {
+    public ModelAndView addOperation(@ModelAttribute("operation") Operation operation, Model model, @RequestParam("operationType") String operationType, @RequestParam("codeCompte") String codeCompte, @RequestParam(value = "selectedOtherCompte", required = false) String selectedOtherCompte) {
 
 //        System.out.println("operationType, " + operationType);
         System.out.println("selectedCompteCode, " + selectedOtherCompte);
@@ -207,7 +207,49 @@ public class CompteRestService {
             employeMetier.addOperation(new Virement(), codeCompte, 1L, operation.getMontant());
         }
 
+        Compte selectedCompte = compteRepository.findByCodeCompte(codeCompte);
+        model.addAttribute("selectedCompte", selectedCompte);
+        List<Compte> comptes = compteMetier.allComptes();
+
+        Operation operation2 = new Operation();
+
+        comptes.forEach(compte -> {
+            compte.getOperations().forEach(op -> {
+                if (op instanceof Retrait) {
+                    ((Retrait) op).setTypeOperation("Retrait");
+                } else if (op instanceof Versment) {
+                    ((Versment) op).setTypeOperation("Versment");
+                }
+            });
+            if (compte instanceof CompteCourant) {
+                ((CompteCourant) compte).setTypeCompte("Compte Courant");
+            } else if (compte instanceof CompteEpargne) {
+                ((CompteEpargne) compte).setTypeCompte("Compte Epargne");
+            }
+        });
+
+
+        model.addAttribute("comptes", comptes);
+        model.addAttribute("operation", operation2);
+
+        ModelAndView modelAndView = new ModelAndView("Views/Transactions");
+        modelAndView.addObject("selectedCompte", selectedCompte);
+
+        return modelAndView;
+
     }
 
+
+    @GetMapping("/home")
+    public ModelAndView homeEmp(Model model) {
+        ModelAndView modelAndView= new ModelAndView("HomeEmploye");
+
+//        Compte compte = new Compte();
+
+//        model.addAttribute("compte", compte);
+//        model.addAttribute("clients", clientMetier.listClient());
+
+        return modelAndView;
+    }
 
 }

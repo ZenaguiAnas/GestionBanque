@@ -2,9 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+<div>
+    <h1>Account Types Overview</h1>
+    <canvas id="accountChart" width="300" height="300"></canvas>
+</div>
 
+<script>
+    const compteCounts = {
+        "Compte Courant": 50,
+        "Compte Epargne": 30
+    };
+
+    const ctx = document.getElementById('accountChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(compteCounts),
+            datasets: [{
+                label: 'Account Types',
+                data: Object.values(compteCounts),
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.5)',
+                    'rgba(54, 162, 235, 0.5)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: false, // Disable responsive mode
+            maintainAspectRatio: false // Allow the chart to scale
+        }
+    });
+</script>
 </body>
 </html>
