@@ -24,7 +24,7 @@
 
 <div class="w-2/6 mx-auto p-6 bg-white shadow-md rounded">
     <h1 class="text-3xl font-semibold mb-12 text-center">Authentification Client</h1>
-    <form th:action="@{/create-client}" method="post" th:object="${client}">
+    <form th:action="@{/authentifierClient}" method="post" th:object="${client}">
         <!-- Existing 'nomClient' input -->
         <div class="mb-4">
             <label for="nomClient" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
@@ -33,12 +33,12 @@
 
         <!-- New 'typeCpte' input -->
         <div class="mb-4">
-            <label for="typeCpte" class="block text-gray-700 text-sm font-bold mb-2">Account Type:</label>
-            <input type="text" id="typeCpte" name="typeCpte" placeholder="Enter Account Type" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+            <label for="codeCompte" class="block text-gray-700 text-sm font-bold mb-2">Code Client:</label>
+            <input type="text" id="codeCompte" name="codeCompte" th:field="*{codeClient}" placeholder="Enter your code " class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
         </div>
 
         <div class="flex items-center justify-between">
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Add</button>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Sign in</button>
         </div>
     </form>
 

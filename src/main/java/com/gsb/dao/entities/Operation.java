@@ -3,6 +3,7 @@ package com.gsb.dao.entities;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 //import javax.persistence.*;
 import java.io.Serializable;
@@ -15,6 +16,7 @@ public class Operation implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long numeroOperation;
+    @CreationTimestamp
     private Date dateOperation;
     private double montant;
     @ManyToOne

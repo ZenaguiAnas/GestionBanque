@@ -2,6 +2,8 @@ package com.gsb.dao.entities;
 
 
 import jakarta.persistence.*;
+import jdk.jfr.Timestamp;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -12,6 +14,8 @@ import java.util.Date;
 public class Compte implements Serializable {
     @Id
     private String codeCompte;
+
+    @CreationTimestamp
     private Date dateCreation;
     private double solde;
     @ManyToOne

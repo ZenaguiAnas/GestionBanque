@@ -3,8 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <link href="output.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <!-- Include the following line for Tailwind CSS animations -->
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-gray-100 font-sans">
+
+<div class="container mx-auto p-8">
+    <h1 class="text-3xl font-bold mb-4 text-indigo-700 animate__animated animate__fadeIn">Bienvenue, <span id="welcomeText" class="text-indigo-500 font-semibold" th:text="${Client.nomClient}"></span></h1>
+
+    <div class="bg-white rounded-lg p-6 shadow-md">
+        <p class="text-gray-700 text-2xl" >Code Client: <span class="font-bold text-2xl" th:text="${Client.codeClient}"></span></p>
+    </div>
+
+    <div th:each="compte : ${client.comptes}" class="mt-8 border-t border-gray-300 pt-4 animate__animated animate__fadeIn">
+        <div class="bg-white rounded-lg p-6 shadow-md">
+
+            <p class="text-lg font-semibold text-indigo-700">Type de Compte: <span class="text-indigo-500" th:text="${compte.typeCompte}"></span></p>
+            <p class="text-gray-700">Code de Compte: <span class="font-semibold" th:text="${compte.codeCompte}"></span></p>
+            <p class="text-gray-700">Date Création: <span class="font-semibold" th:text="${#dates.format(compte.dateCreation, 'dd-MM-yyyy')}"></span></p>
+            <p class="text-gray-700">Solde: <span class="font-semibold text-green-600" th:text="${compte.solde}"></span></p>
+
+            <ul class="list-disc pl-6 mt-4">
+                <li th:each="operation : ${compte.operations}" class="mb-4 animate__animated animate__fadeIn">
+                    <div th:switch="${operation.typeOperation}">
+                        <div th:case="'Versment'" class="bg-green-100 bg-opacity-75 rounded-lg p-4">
+                            <p class="text-lg font-semibold text-indigo-700">Type d'opération: <span class="text-indigo-500" th:text="${operation.typeOperation}"></span></p>
+                            <p class="text-gray-700">Numéro: <span class="font-semibold" th:text="${operation.numeroOperation}"></span></p>
+                            <p class="text-gray-700">Montant: <span class="font-semibold text-green-600" th:text="${operation.montant}"></span></p>
+                            <p class="text-gray-700">Date: <span class="font-semibold" th:text="${#dates.format(operation.dateOperation, 'dd-MM-yyyy')}"></span></p>
+                        </div>
+                        <div th:case="'Virement'" class="bg-gray-100 rounded-lg p-4">
+                            <p class="text-lg font-semibold text-indigo-700">Type d'opération: <span class="text-indigo-500" th:text="${operation.typeOperation}"></span></p>
+                            <p class="text-gray-700">Numéro: <span class="font-semibold" th:text="${operation.numeroOperation}"></span></p>
+                            <p class="text-gray-700">Montant: <span class="font-semibold text-blue-600" th:text="${operation.montant}"></span></p>
+                            <p class="text-gray-700">Date: <span class="font-semibold" th:text="${#dates.format(operation.dateOperation, 'dd-MM-yyyy')}"></span></p>
+                        </div>
+                        <div th:case="'Retrait'" class="bg-red-100 rounded-lg p-4">
+                            <p class="text-lg font-semibold text-indigo-700">Type d'opération: <span class="text-indigo-500" th:text="${operation.typeOperation}"></span></p>
+                            <p class="text-gray-700">Numéro: <span class="font-semibold" th:text="${operation.numeroOperation}"></span></p>
+                            <p class="text-gray-700">Montant: <span class="font-semibold text-red-600" th:text="${operation.montant}"></span></p>
+                            <p class="text-gray-700">Date: <span class="font-semibold" th:text="${#dates.format(operation.dateOperation, 'dd-MM-yyyy')}"></span></p>
+                        </div>
+                        <div th:case="*" class="bg-gray-100 rounded-lg p-4">
+                            <p class="text-lg font-semibold text-indigo-700">Type d'opération: <span class="text-indigo-500" th:text="${operation.typeOperation}"></span></p>
+                            <p class="text-gray-700">Numéro: <span class="font-semibold" th:text="${operation.numeroOperation}"></span></p>
+                            <p class="text-gray-700">Montant: <span class="font-semibold" th:text="${operation.montant}"></span></p>
+                            <p class="text-gray-700">Date: <span class="font-semibold" th:text="${#dates.format(operation.dateOperation, 'dd-MM-yyyy')}"></span></p>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Animation for 'Bienvenue' and 'nomClient'
+    const welcomeText = document.getElementById('welcomeText');
+    const textContent = welcomeText.innerText;
+    welcomeText.innerText = '';
+    for (const char of textContent) {
+        const charElement = document.createElement('span');
+        charElement.innerText = char;
+        charElement.style.opacity = 0;
+        charElement.classList.add('animate__animated', 'animate__fadeIn');
+        welcomeText.appendChild(charElement);
+    }
+</script>
 
 </body>
 </html>

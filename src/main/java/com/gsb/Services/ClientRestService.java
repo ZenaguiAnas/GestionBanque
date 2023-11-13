@@ -2,9 +2,7 @@ package com.gsb.Services;
 
 import com.gsb.Metier.ClientMetier;
 import com.gsb.Metier.CompteMetier;
-import com.gsb.dao.entities.Client;
-import com.gsb.dao.entities.CompteCourant;
-import com.gsb.dao.entities.CompteEpargne;
+import com.gsb.dao.entities.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -45,18 +43,26 @@ public class ClientRestService {
 
     // TODO : Templates
     @PostMapping("/authentifierClient")
-    public String authentifierClient(@ModelAttribute("client") Client client, Model model  , HttpSession httpSession) {
-
+    public ModelAndView authentifierClient(@ModelAttribute("client") Client client, Model model  , HttpSession httpSession) {
+        ModelAndView modelAndView;
         Client clientX = new Client();
         clientX.setCodeClient((Long) client.getCodeClient());
         clientX.setNomClient((String) client.getNomClient());
         model.addAttribute("Client",clientX);
 
-        httpSession.setAttribute("Client", clientX);
-        Client client2 = (Client) httpSession.getAttribute("Client");
-        System.out.println(client2.getNomClient());
-        clientMetier.authentifierClient(clientX);
-        return "redirect:/authentifierClient";
+
+        System.out.println(clientX.getNomClient());
+        Client client1 = clientMetier.authentifierClient(clientX);
+
+        if (client1==null){
+            modelAndView= new ModelAndView("authentifierClient");
+            return modelAndView;
+        }
+        else {
+            modelAndView= new ModelAndView("HomeClient");
+            httpSession.setAttribute("Client", client1);
+            return clientHome(model,httpSession);
+        }
     }
 
     @GetMapping("/auth")
@@ -115,6 +121,37 @@ public class ClientRestService {
             compteMetier.addCompte(new CompteEpargne(), codeClient, codeEmploye, codeCompte);
         }
     }
+    @GetMapping("/clientHome")
+    public  ModelAndView clientHome(Model model, HttpSession httpSession) {
+        Client client = (Client) httpSession.getAttribute("Client");
+
+        client.getComptes().forEach(compte -> {
+            compte.getOperations().forEach(op -> {
+                if (op instanceof Retrait) {
+                    ((Retrait) op).setTypeOperation("Retrait");
+                } else if (op instanceof Versment) {
+                    ((Versment) op).setTypeOperation("Versment");
+                }
+                else if (op instanceof Virement) {
+                    ((Virement) op).setTypeOperation("Virement");
+                }
+            });
+            if (compte instanceof CompteCourant) {
+                ((CompteCourant) compte).setTypeCompte("Compte Courant");
+            } else if (compte instanceof CompteEpargne) {
+                ((CompteEpargne) compte).setTypeCompte("Compte Epargne");
+            }
+        });
+
+        model.addAttribute("client", client);
+
+
+        ModelAndView modelAndView = new ModelAndView("HomeClient");
+        return modelAndView;
+    }
+
+
+
 
 
 
