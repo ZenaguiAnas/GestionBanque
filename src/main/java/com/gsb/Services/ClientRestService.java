@@ -2,7 +2,10 @@ package com.gsb.Services;
 
 import com.gsb.Metier.ClientMetier;
 import com.gsb.Metier.CompteMetier;
+import com.gsb.Metier.EmployeMetier;
 import com.gsb.dao.entities.*;
+
+import com.gsb.dao.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
@@ -18,6 +21,12 @@ public class ClientRestService {
 
     @Autowired
     private CompteMetier compteMetier;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private EmployeMetier employeMetier;
 
 //    @RequestMapping(value="/create-client",method=RequestMethod.POST)
 //    public Client saveClient(@RequestBody Client c) {
@@ -42,34 +51,76 @@ public class ClientRestService {
 
 
     // TODO : Templates
-    @PostMapping("/authentifierClient")
-    public ModelAndView authentifierClient(@ModelAttribute("client") Client client, Model model  , HttpSession httpSession) {
+    @PostMapping("/authentifierUser")
+    public ModelAndView authentifierClient(@ModelAttribute("user") User user, Model model  , HttpSession httpSession) {
         ModelAndView modelAndView;
-        Client clientX = new Client();
-        clientX.setCodeClient((Long) client.getCodeClient());
-        clientX.setNomClient((String) client.getNomClient());
-        model.addAttribute("Client",clientX);
+
+        User userX = new User();
+        userX.setUserId((Long) user.getUserId());
+        userX.setUsername((String) user.getUsername());
+
+        User user1 = userRepository.findByUserIdAndUsername(userX.getUserId(), userX.getUsername());
+
+        System.out.println("userRole, " + user1.getUserRole());
 
 
-        System.out.println(clientX.getNomClient());
-        Client client1 = clientMetier.authentifierClient(clientX);
+        if (user1.getUserRole().equals("Client")){
 
-        if (client1==null){
-            modelAndView= new ModelAndView("authentifierClient");
+            Client clientX = new Client();
+            clientX.setCodeClient(userX.getUserId());
+            clientX.setNomClient(userX.getUsername());
+
+            Client client1 = clientMetier.authentifierClient(clientX);
+
+            if (client1==null){
+                modelAndView= new ModelAndView("authentifierClient");
+                return modelAndView;
+            }
+            else {
+                System.out.println("client name, " + client1.getNomClient());
+
+                modelAndView= new ModelAndView("HomeClient");
+                httpSession.setAttribute("Client", client1);
+                return clientHome(model,httpSession);
+            }
+        }
+        else if (user1.getUserRole().equals("Employe")) {
+            Employe employeX = new Employe();
+            employeX.setCodeEmploye(userX.getUserId());
+            employeX.setNomEmploye(userX.getUsername());
+
+            Employe employe = employeMetier.authentifierEmploye(employeX);
+
+            if (employe == null){
+                modelAndView = new ModelAndView("authentifierClient");
+                model.addAttribute("employe", employe);
+                return modelAndView;
+            }
+            else {
+                modelAndView= new ModelAndView("HomeEmploye");
+                httpSession.setAttribute("Employe", employe);
+                return modelAndView;
+            }
+        } else if (user1.getUserRole().equals("Admin")) {
+            modelAndView= new ModelAndView("HomeAdmin");
+            System.out.println("Admin, " + user1.getUsername());
+            model.addAttribute("admin", user1);
             return modelAndView;
         }
-        else {
-            modelAndView= new ModelAndView("HomeClient");
-            httpSession.setAttribute("Client", client1);
-            return clientHome(model,httpSession);
-        }
+
+        modelAndView = new ModelAndView("authentifierClient");
+
+        return modelAndView;
     }
+
+
+
 
     @GetMapping("/auth")
     public ModelAndView authentifierClient(Model model) {
         ModelAndView modelAndView= new ModelAndView("authentifierClient");
-        Client client = new Client();
-        model.addAttribute("client", client);
+        User user = new User();
+        model.addAttribute("user", user);
 
         return modelAndView;
     }
@@ -100,8 +151,11 @@ public class ClientRestService {
 
         String codeCompte = generateUniqueCodeCompte(typeCpte, client1.getCodeClient());
 
+        userRepository.save(new User(client1.getNomClient(), client1.getCodeClient(), "Client"));
+
         try {
             saveCompte(typeCpte, client.getCodeClient(), 1L, codeCompte);
+
         } catch (Exception e) {
             throw new RuntimeException("There is an error!");
         }
@@ -151,6 +205,53 @@ public class ClientRestService {
     }
 
 
+
+
+    // TODO : Templates
+    @GetMapping("/operationsClient-page")
+    public ModelAndView getOpsPage(Model model) {
+        ModelAndView modelAndView = new ModelAndView("Views/CompteClient");
+
+        List<Client> clients = clientMetier.listClient();
+
+        model.addAttribute("clients", clients);
+
+        return modelAndView;
+    }
+
+    @PostMapping("/operationsClient-page")
+    public ModelAndView displayComptes(@RequestParam("selectedClient") Long selectedClientCode, Model model) {
+        Client selectedClient = clientMetier.consulterClient(selectedClientCode);
+
+        model.addAttribute("selectedClient", selectedClient);
+        List<Compte> comptes = compteMetier.allComptes();
+
+//        Operation operation = new Operation();
+
+//        comptes.forEach(compte -> {
+//            compte.getOperations().forEach(op -> {
+//                if (op instanceof Retrait) {
+//                    ((Retrait) op).setTypeOperation("Retrait");
+//                } else if (op instanceof Versment) {
+//                    ((Versment) op).setTypeOperation("Versment");
+//                }
+//            });
+//            if (compte instanceof CompteCourant) {
+//                ((CompteCourant) compte).setTypeCompte("Compte Courant");
+//            } else if (compte instanceof CompteEpargne) {
+//                ((CompteEpargne) compte).setTypeCompte("Compte Epargne");
+//            }
+//        });
+
+
+        model.addAttribute("comptes", comptes);
+//        model.addAttribute("operation", operation);
+
+        ModelAndView modelAndView = new ModelAndView("Views/CompteClient");
+        modelAndView.addObject("selectedClient", selectedClient);
+
+        return modelAndView;
+    }
 
 
 

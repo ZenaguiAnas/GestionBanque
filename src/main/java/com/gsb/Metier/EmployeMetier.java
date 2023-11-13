@@ -22,4 +22,5 @@ public interface EmployeMetier {
     public List<Operation> listOperations(Compte compte);
 
     Employe authentifierEmploye(Employe employe);
+
 }

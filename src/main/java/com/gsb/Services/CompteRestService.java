@@ -239,6 +239,7 @@ public class CompteRestService {
 
     }
 
+    // TODO : GET Compte operations based on the (@PathVariable String codeCompte)
 
     @GetMapping("/home")
     public ModelAndView homeEmp(Model model) {

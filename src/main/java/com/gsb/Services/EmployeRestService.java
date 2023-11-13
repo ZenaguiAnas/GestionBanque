@@ -4,6 +4,7 @@ import com.gsb.Metier.CompteMetier;
 import com.gsb.Metier.EmployeMetier;
 import com.gsb.dao.entities.*;
 import com.gsb.dao.repository.ClientRepository;
+import com.gsb.dao.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +23,17 @@ public class EmployeRestService {
     @Autowired
     private ClientRepository clientRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @RequestMapping(value="/add-employe",method=RequestMethod.POST)
     public Employe saveEmploye(@RequestBody Employe e) {
-        return employeMetier.saveEmploye(e);
+
+        Employe employe = employeMetier.saveEmploye(e);
+
+        userRepository.save(new User(employe.getNomEmploye(), employe.getCodeEmploye(), "Employe"));
+
+        return employe;
     }
 
     @RequestMapping(value="/employes",method=RequestMethod.GET)
