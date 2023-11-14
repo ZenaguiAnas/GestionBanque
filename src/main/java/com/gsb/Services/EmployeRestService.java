@@ -4,11 +4,17 @@ import com.gsb.Metier.CompteMetier;
 import com.gsb.Metier.EmployeMetier;
 import com.gsb.dao.entities.*;
 import com.gsb.dao.repository.ClientRepository;
+import com.gsb.dao.repository.EmployeRepository;
+import com.gsb.dao.repository.GroupeRepository;
 import com.gsb.dao.repository.UserRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +31,10 @@ public class EmployeRestService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private GroupeRepository groupeRepository;
+    @Autowired
+    private EmployeRepository employeRepository;
 
     @RequestMapping(value="/add-employe",method=RequestMethod.POST)
     public Employe saveEmploye(@RequestBody Employe e) {
@@ -36,11 +46,7 @@ public class EmployeRestService {
         return employe;
     }
 
-    @RequestMapping(value="/employes",method=RequestMethod.GET)
-    public List<Employe> listEmployes() {
-        System.out.println(clientRepository.findById(1L).orElse(null).getNomClient());
-        return employeMetier.listEmployes();
-    }
+
 
     @RequestMapping(value="/authentifierEmploye", method=RequestMethod.POST)
     public Employe authentifierClient(@RequestParam("codeEmploye") Long codeEmploye, @RequestParam("nomEmploye") String nomEmploye, HttpSession httpSession) {
@@ -99,6 +105,44 @@ public class EmployeRestService {
     public List<Operation> listOperationsOfCompte(@PathVariable String codeCompte){
         Compte compte = compteMetier.getCompte(codeCompte);
         return employeMetier.listOperations(compte);
+    }
+    @PostMapping("/create-employe")
+    public String createEmploye(@ModelAttribute("employe") Employe employe,
+                                @RequestParam("codeGroupe") Long codeGroupe,
+                                @RequestParam("codeEmpSup") Long codeEmpSup) {
+        Employe employe2 = employeRepository.findByCodeEmploye(codeEmpSup);
+        employe.setEmployeSup(employe2);
+
+        Employe employe1 = employeMetier.saveEmploye(employe);
+
+        Groupe groupe = groupeRepository.findByCodeGroupe(codeGroupe);
+        System.out.println(groupe.getNomGroupe());
+
+        // Initialize the list if it's null
+        Collection<Groupe> list = employe1.getGroupes();
+        if (list == null) {
+            list = new ArrayList<>();
+        }
+
+        list.add(groupe);
+        employe1.setGroupes(list);
+        employeRepository.save(employe1);
+
+        userRepository.save(new User(employe1.getNomEmploye(), employe1.getCodeEmploye(), "Employe"));
+
+        return "redirect:/clients-page";
+    }
+
+    @GetMapping("/add-employe")
+    public ModelAndView addEmployesPage(Model model) {
+        ModelAndView modelAndView= new ModelAndView("Components/AddEmploye");
+
+        Employe employe = new Employe();
+        model.addAttribute("employes",employeMetier.listEmployes());
+        model.addAttribute("employe",employe);
+        model.addAttribute("groupes", groupeRepository.findAll());
+
+        return modelAndView;
     }
 
 

@@ -102,10 +102,10 @@ public class ClientRestService {
                 return modelAndView;
             }
         } else if (user1.getUserRole().equals("Admin")) {
-            modelAndView= new ModelAndView("HomeAdmin");
+
             System.out.println("Admin, " + user1.getUsername());
             model.addAttribute("admin", user1);
-            return modelAndView;
+            return getEmployePage(model);
         }
 
         modelAndView = new ModelAndView("authentifierClient");
@@ -123,6 +123,18 @@ public class ClientRestService {
         model.addAttribute("user", user);
 
         return modelAndView;
+    }
+    @GetMapping("/employes-page")
+    public ModelAndView getEmployePage(Model model) {
+        ModelAndView modelAndView= new ModelAndView("HomeAdmin");
+        model.addAttribute("employes", employeMetier.listEmployes());
+        System.out.println(listEmployes());
+
+        return modelAndView;
+    }
+    @RequestMapping(value="/employes",method=RequestMethod.GET)
+    public List<Employe> listEmployes() {
+        return employeMetier.listEmployes();
     }
 
     @GetMapping("/clients-page")

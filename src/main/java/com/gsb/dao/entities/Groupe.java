@@ -10,6 +10,7 @@ public class Groupe implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long codeGroupe;
     private String nomGroupe;
+
     @ManyToMany(mappedBy = "groupes")
     private Collection<Employe> employe;
 
