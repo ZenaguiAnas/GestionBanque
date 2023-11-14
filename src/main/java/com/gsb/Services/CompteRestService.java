@@ -246,6 +246,8 @@ public class CompteRestService {
                     ((Retrait) op).setTypeOperation("Retrait");
                 } else if (op instanceof Versment) {
                     ((Versment) op).setTypeOperation("Versment");
+                } else if (op instanceof Virement) {
+                    ((Virement) op).setTypeOperation("Virement");
                 }
             });
             if (compte instanceof CompteCourant) {

@@ -162,6 +162,11 @@ public class ClientRestService {
     @GetMapping("/employes-page")
     public ModelAndView getEmployePage(Model model) {
         ModelAndView modelAndView= new ModelAndView("HomeAdmin");
+
+        employeMetier.listEmployes().forEach(emp -> {
+            System.out.println("nomEmploye, " + emp.getNomEmploye() + ", emp Sup" + emp.getEmployeSup().getNomEmploye());
+        });
+
         model.addAttribute("employes", employeMetier.listEmployes());
         System.out.println(listEmployes());
 
@@ -180,6 +185,8 @@ public class ClientRestService {
         else if (userRole.equals("Client")) {
             return new ModelAndView("UnauthorizedPage");
         }
+
+
 
         ModelAndView modelAndView= new ModelAndView("Views/Clients");
         model.addAttribute("clients", clientMetier.listClient());
@@ -209,7 +216,7 @@ public class ClientRestService {
     }
 
     @PostMapping("/create-client")
-    public ModelAndView createClient(@ModelAttribute("client") Client client, @RequestParam("typeCpte") String typeCpte) {
+    public ModelAndView createClient(@ModelAttribute("client") Client client, @RequestParam("typeCpte") String typeCpte, Model model, HttpSession httpSession) {
         Client client1 = clientMetier.saveClient(client);
 
         String codeCompte = generateUniqueCodeCompte(typeCpte, client1.getCodeClient());
@@ -224,7 +231,7 @@ public class ClientRestService {
             throw new RuntimeException("There is an error!");
         }
 
-        return modelAndView;
+        return getClientsPage(model,httpSession);
     }
 
     private String generateUniqueCodeCompte(String typeCpte, Long codeClient) {
