@@ -5,6 +5,7 @@ import com.gsb.Metier.CompteMetier;
 import com.gsb.Metier.EmployeMetier;
 import com.gsb.dao.entities.*;
 import com.gsb.dao.repository.CompteRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -75,8 +76,17 @@ public class CompteRestService {
 
     //TODO : TEMPLATES
     @GetMapping("/comptes-page")
-    public ModelAndView getComptesPage(Model model) {
+    public ModelAndView getComptesPage(Model model, HttpSession httpSession) {
+//        System.out.println("userRoleTset, " + httpSession.getAttribute("userRole"));
+        String userRole = (String) httpSession.getAttribute("userRole");
+        if(userRole.equals("Other")) return new ModelAndView("authentifierClient");
+
+        else if (userRole.equals("Client")) {
+            return new ModelAndView("UnauthorizedPage");
+        }
+
         ModelAndView modelAndView = new ModelAndView("Views/Comptes");
+
 
         List<Compte> comptes = compteMetier.allComptes();
 
@@ -94,7 +104,15 @@ public class CompteRestService {
     }
 
     @GetMapping("/add-compte")
-    public ModelAndView addClientsPage(Model model) {
+    public ModelAndView addClientsPage(Model model, HttpSession httpSession) {
+
+        String userRole = (String) httpSession.getAttribute("userRole");
+        if(userRole.equals("Other")) return new ModelAndView("authentifierClient");
+
+        else if (userRole.equals("Client")) {
+            return new ModelAndView("UnauthorizedPage");
+        }
+
         ModelAndView modelAndView= new ModelAndView("Components/AddCompte");
 
         Compte compte = new Compte();
@@ -137,7 +155,14 @@ public class CompteRestService {
 
 
     @GetMapping("/operations-page")
-    public ModelAndView getOpsPage(Model model) {
+    public ModelAndView getOpsPage(Model model, HttpSession httpSession) {
+        String userRole = (String) httpSession.getAttribute("userRole");
+        if(userRole.equals("Other")) return new ModelAndView("authentifierClient");
+
+        else if (userRole.equals("Client")) {
+            return new ModelAndView("UnauthorizedPage");
+        }
+
         ModelAndView modelAndView = new ModelAndView("Views/Transactions");
 
         List<Compte> comptes = compteMetier.allComptes();
@@ -169,6 +194,8 @@ public class CompteRestService {
                     ((Retrait) op).setTypeOperation("Retrait");
                 } else if (op instanceof Versment) {
                     ((Versment) op).setTypeOperation("Versment");
+                } else if (op instanceof Virement) {
+                    ((Virement) op).setTypeOperation("Virement");
                 }
             });
             if (compte instanceof CompteCourant) {
@@ -241,16 +268,16 @@ public class CompteRestService {
 
     // TODO : GET Compte operations based on the (@PathVariable String codeCompte)
 
-    @GetMapping("/home")
-    public ModelAndView homeEmp(Model model) {
-        ModelAndView modelAndView= new ModelAndView("HomeEmploye");
-
-//        Compte compte = new Compte();
-
-//        model.addAttribute("compte", compte);
-//        model.addAttribute("clients", clientMetier.listClient());
-
-        return modelAndView;
-    }
+//    @GetMapping("/home")
+//    public ModelAndView homeEmp(Model model) {
+//        ModelAndView modelAndView= new ModelAndView("HomeEmploye");
+//
+////        Compte compte = new Compte();
+//
+////        model.addAttribute("compte", compte);
+////        model.addAttribute("clients", clientMetier.listClient());
+//
+//        return modelAndView;
+//    }
 
 }

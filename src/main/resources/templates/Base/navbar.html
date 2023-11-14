@@ -14,7 +14,29 @@
             <a class="px-4 py-2 mt-2 text-sm font-semibold rounded-lg hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline" href="/comptes-page">Comptes</a>
             <a class="px-4 py-2 mt-2 text-sm font-semibold rounded-lg hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline" href="/clients-page">Clients</a>
             <a class="px-4 py-2 mt-2 text-sm font-semibold rounded-lg hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline" href="/operations-page">Operations</a>
+            <form th:action="@{/logout}" method="post">
+                <button type="submit" class="px-4 py-2 mt-2 text-sm font-semibold rounded-lg hover:text-gray-900 focus:text-gray-900 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none focus:shadow-outline">Logout</button>
+            </form>
         </nav>
 
     </div>
 </div>
+
+<!--<script>-->
+<!--    function logout() {-->
+<!--        fetch('/logout', {-->
+<!--            method: 'POST',-->
+<!--            body: '',-->
+<!--        })-->
+<!--            .then(response => {-->
+<!--                if (response.ok) {-->
+<!--                    window.location.href = '/auth';-->
+<!--                } else {-->
+<!--                    console.error('Logout failed');-->
+<!--                }-->
+<!--            })-->
+<!--            .catch(error => {-->
+<!--                console.error('Error during logout:', error);-->
+<!--            });-->
+<!--    }-->
+<!--</script>-->

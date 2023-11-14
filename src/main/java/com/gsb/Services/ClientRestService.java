@@ -52,7 +52,7 @@ public class ClientRestService {
 
     // TODO : Templates
     @PostMapping("/authentifierUser")
-    public ModelAndView authentifierClient(@ModelAttribute("user") User user, Model model  , HttpSession httpSession) {
+    public ModelAndView authentifierClient(@ModelAttribute("user") User user, Model model, HttpSession httpSession) {
         ModelAndView modelAndView;
 
         User userX = new User();
@@ -80,7 +80,11 @@ public class ClientRestService {
                 System.out.println("client name, " + client1.getNomClient());
 
                 modelAndView= new ModelAndView("HomeClient");
+                Object o = "Client";
+                httpSession.setAttribute("userRole", o);
                 httpSession.setAttribute("Client", client1);
+//                model.addAttribute("Client", client1);
+
                 return clientHome(model,httpSession);
             }
         }
@@ -97,27 +101,58 @@ public class ClientRestService {
                 return modelAndView;
             }
             else {
-                modelAndView= new ModelAndView("HomeEmploye");
+
+//                List<Client> clients = clientMetier.listClient();
+
+                model.addAttribute("clients", clientMetier.listClient());
+
+                modelAndView = new ModelAndView("HomeEmploye");
+
                 httpSession.setAttribute("Employe", employe);
+                Object o = "Employe";
+                httpSession.setAttribute("userRole", o);
+
                 return modelAndView;
             }
         } else if (user1.getUserRole().equals("Admin")) {
 
             System.out.println("Admin, " + user1.getUsername());
             model.addAttribute("admin", user1);
-            return getEmployePage(model);
+            modelAndView = new ModelAndView("HomeAdmin");
+//<<<<<<< Updated upstream
+//            return getEmployePage(model);
+//=======
+            Object o = "Admin";
+            httpSession.setAttribute("userRole", o);
+            return modelAndView;
         }
 
+        Object o = "Other";
+        httpSession.setAttribute("userRole", o);
         modelAndView = new ModelAndView("authentifierClient");
 
         return modelAndView;
     }
 
 
-
-
     @GetMapping("/auth")
-    public ModelAndView authentifierClient(Model model) {
+    public ModelAndView authentifierClient(Model model, HttpSession httpSession) {
+
+        String userRole = (String) httpSession.getAttribute("userRole");
+
+        if (userRole.equals("Employe")) {
+            return employeHome(model, httpSession);
+        }
+
+        else if (userRole.equals("Client")) {
+            return clientHome(model, httpSession);
+        }
+
+        else if (userRole.equals("Admin")) {
+            ModelAndView modelAndView = new ModelAndView("HomeAdmin");
+            return modelAndView;
+        }
+
         ModelAndView modelAndView= new ModelAndView("authentifierClient");
         User user = new User();
         model.addAttribute("user", user);
@@ -138,7 +173,14 @@ public class ClientRestService {
     }
 
     @GetMapping("/clients-page")
-    public ModelAndView getClientsPage(Model model) {
+    public ModelAndView getClientsPage(Model model, HttpSession httpSession) {
+        String userRole = (String) httpSession.getAttribute("userRole");
+        if(userRole.equals("Other")) return new ModelAndView("authentifierClient");
+
+        else if (userRole.equals("Client")) {
+            return new ModelAndView("UnauthorizedPage");
+        }
+
         ModelAndView modelAndView= new ModelAndView("Views/Clients");
         model.addAttribute("clients", clientMetier.listClient());
 
@@ -146,7 +188,16 @@ public class ClientRestService {
     }
 
     @GetMapping("/add-client")
-    public ModelAndView addClientsPage(Model model) {
+    public ModelAndView addClientsPage(Model model, HttpSession httpSession) {
+
+        String userRole = (String) httpSession.getAttribute("userRole");
+
+        if(userRole.equals("Other")) return new ModelAndView("authentifierClient");
+
+        else if (userRole.equals("Client")) {
+            return new ModelAndView("UnauthorizedPage");
+        }
+
         ModelAndView modelAndView= new ModelAndView("Components/AddClient");
 
         Client client = new Client();
@@ -158,12 +209,13 @@ public class ClientRestService {
     }
 
     @PostMapping("/create-client")
-    public String createClient(@ModelAttribute("client") Client client, @RequestParam("typeCpte") String typeCpte) {
+    public ModelAndView createClient(@ModelAttribute("client") Client client, @RequestParam("typeCpte") String typeCpte) {
         Client client1 = clientMetier.saveClient(client);
 
         String codeCompte = generateUniqueCodeCompte(typeCpte, client1.getCodeClient());
 
         userRepository.save(new User(client1.getNomClient(), client1.getCodeClient(), "Client"));
+        ModelAndView modelAndView= new ModelAndView("Views/Clients");
 
         try {
             saveCompte(typeCpte, client.getCodeClient(), 1L, codeCompte);
@@ -172,7 +224,7 @@ public class ClientRestService {
             throw new RuntimeException("There is an error!");
         }
 
-        return "redirect:/clients-page";
+        return modelAndView;
     }
 
     private String generateUniqueCodeCompte(String typeCpte, Long codeClient) {
@@ -189,6 +241,13 @@ public class ClientRestService {
     }
     @GetMapping("/clientHome")
     public  ModelAndView clientHome(Model model, HttpSession httpSession) {
+//        String userRole = (String) httpSession.getAttribute("userRole");
+//        if(userRole.equals("Other")) return new ModelAndView("authentifierClient");
+//
+//        else if (userRole.equals("Employe")) {
+//            return new ModelAndView("UnauthorizedPage");
+//        }
+
         Client client = (Client) httpSession.getAttribute("Client");
 
         client.getComptes().forEach(compte -> {
@@ -217,6 +276,58 @@ public class ClientRestService {
     }
 
 
+    @GetMapping("/home")
+    public  ModelAndView employeHome(Model model, HttpSession httpSession) {
+        String userRole = (String) httpSession.getAttribute("userRole");
+        if(userRole.equals("Other")) return authentifierClient(model, httpSession);
+
+        else if (userRole.equals("Client")) {
+            return new ModelAndView("UnauthorizedPage");
+        }
+
+        List<Client> clients = clientMetier.listClient();
+
+        model.addAttribute("clients", clients);
+
+        ModelAndView modelAndView = new ModelAndView("HomeEmploye");
+        return modelAndView;
+    }
+
+    @PostMapping("/home")
+    public  ModelAndView employeStateHome(@RequestParam("selectedClient") Long selectedClientCode, Model model) {
+
+        Client selectedClient = clientMetier.consulterClient(selectedClientCode);
+
+        selectedClient.getComptes().forEach(compte -> {
+            compte.getOperations().forEach(op -> {
+                if (op instanceof Retrait) {
+                    ((Retrait) op).setTypeOperation("Retrait");
+                } else if (op instanceof Versment) {
+                    ((Versment) op).setTypeOperation("Versment");
+                }
+                else if (op instanceof Virement) {
+                    ((Virement) op).setTypeOperation("Virement");
+                }
+            });
+            if (compte instanceof CompteCourant) {
+                ((CompteCourant) compte).setTypeCompte("Compte Courant");
+            } else if (compte instanceof CompteEpargne) {
+                ((CompteEpargne) compte).setTypeCompte("Compte Epargne");
+            }
+        });
+
+        List<Client> clients = clientMetier.listClient();
+
+        model.addAttribute("clients", clients);
+
+        model.addAttribute("selectedClient", selectedClient);
+
+
+
+        ModelAndView modelAndView = new ModelAndView("HomeEmploye");
+
+        return modelAndView;
+    }
 
 
     // TODO : Templates
@@ -238,26 +349,7 @@ public class ClientRestService {
         model.addAttribute("selectedClient", selectedClient);
         List<Compte> comptes = compteMetier.allComptes();
 
-//        Operation operation = new Operation();
-
-//        comptes.forEach(compte -> {
-//            compte.getOperations().forEach(op -> {
-//                if (op instanceof Retrait) {
-//                    ((Retrait) op).setTypeOperation("Retrait");
-//                } else if (op instanceof Versment) {
-//                    ((Versment) op).setTypeOperation("Versment");
-//                }
-//            });
-//            if (compte instanceof CompteCourant) {
-//                ((CompteCourant) compte).setTypeCompte("Compte Courant");
-//            } else if (compte instanceof CompteEpargne) {
-//                ((CompteEpargne) compte).setTypeCompte("Compte Epargne");
-//            }
-//        });
-
-
         model.addAttribute("comptes", comptes);
-//        model.addAttribute("operation", operation);
 
         ModelAndView modelAndView = new ModelAndView("Views/CompteClient");
         modelAndView.addObject("selectedClient", selectedClient);
@@ -265,6 +357,15 @@ public class ClientRestService {
         return modelAndView;
     }
 
+    @PostMapping("/logout")
+    public ModelAndView displayComptes(Model model, HttpSession httpSession) {
+
+        Object o = "Other";
+        httpSession.setAttribute("userRole", o);
+
+
+        return authentifierClient(model, httpSession);
+    }
 
 
 

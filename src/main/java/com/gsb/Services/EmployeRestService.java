@@ -107,9 +107,12 @@ public class EmployeRestService {
         return employeMetier.listOperations(compte);
     }
     @PostMapping("/create-employe")
-    public String createEmploye(@ModelAttribute("employe") Employe employe,
+    public ModelAndView createEmploye(@ModelAttribute("employe") Employe employe,
                                 @RequestParam("codeGroupe") Long codeGroupe,
                                 @RequestParam("codeEmpSup") Long codeEmpSup) {
+
+        ModelAndView modelAndView = new ModelAndView("HomeAdmin");
+
         Employe employe2 = employeRepository.findByCodeEmploye(codeEmpSup);
         employe.setEmployeSup(employe2);
 
@@ -130,7 +133,7 @@ public class EmployeRestService {
 
         userRepository.save(new User(employe1.getNomEmploye(), employe1.getCodeEmploye(), "Employe"));
 
-        return "redirect:/clients-page";
+        return modelAndView;
     }
 
     @GetMapping("/add-employe")
